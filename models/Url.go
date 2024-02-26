@@ -2,17 +2,18 @@ package models
 
 import (
 	"github.com/MrMohebi/golang-gin-boilerplate.git/configs"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Url struct {
-	Id          int    `json:"id" bson:"_id"`
-	Title       string `json:"title"`
-	Hash        string `json:"hash"`
-	OriginalUrl string `json:"original_url"`
-	CreatedAt   string `json:"created_at"`
-	UpdatedAt   string `json:"updated_at"`
-	DeletedAt   string `json:"deleted_at"`
+	Id          primitive.ObjectID `json:"id" bson:"_id"`
+	Title       string             `json:"title" bson:"title"`
+	ShortLink   string             `json:"short_link" bson:"short_link"`
+	OriginalUrl string             `json:"original_url" bson:"original_url"`
+	CreatedAt   string             `json:"created_at" bson:"created_at"`
+	UpdatedAt   string             `json:"updated_at" bson:"updated_at"`
+	DeletedAt   string             `json:"deleted_at" bson:"deleted_at"`
 }
 
 var UrlsCollection *mongo.Collection = configs.GetCollection(configs.GetDBClint(), "urls")

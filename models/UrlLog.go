@@ -7,6 +7,7 @@ import (
 )
 
 type UrlLog struct {
+	ID         primitive.ObjectID `json:"id" bson:"_id"`
 	UrlId      primitive.ObjectID `json:"url_id"`
 	ClickCount int                `json:"click_count"`
 	UserAgent  string             `json:"user_agent"`
