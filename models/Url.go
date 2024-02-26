@@ -8,7 +8,7 @@ import (
 type Url struct {
 	Id          int    `json:"id" bson:"_id"`
 	Title       string `json:"title"`
-	Hash        string `json:"hash" bson:"hash"`
+	Hash        string `json:"hash"`
 	OriginalUrl string `json:"original_url"`
 	CreatedAt   string `json:"created_at"`
 	UpdatedAt   string `json:"updated_at"`
