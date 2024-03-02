@@ -14,6 +14,8 @@ type Url struct {
 	CreatedAt   string             `json:"created_at" bson:"created_at"`
 	UpdatedAt   string             `json:"updated_at" bson:"updated_at"`
 	DeletedAt   string             `json:"deleted_at" bson:"deleted_at"`
+	ExpireDate  string             `json:"expire_date" bson:"expire_date"`
+	Status      int                `json:"status" bson:"status"`
 }
 
 var UrlsCollection *mongo.Collection = configs.GetCollection(configs.GetDBClint(), "urls")
