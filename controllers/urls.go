@@ -78,13 +78,14 @@ func UpdateLogs(urlId primitive.ObjectID, c *gin.Context) {
 	if urlNotFind != nil {
 		common.IsErr(urlNotFind, false)
 		c.JSON(http.StatusNotFound, gin.H{"message": "لینک مورد نظر یافت نشد."})
+	} else {
+		_, err := urlsLogColl.UpdateOne(ctx, bson.D{{"_id", urlLog.Id}}, bson.M{"$set": bson.M{"click_count": urlLog.ClickCount + 1}})
+		common.IsErr(err, true)
+		c.JSON(http.StatusOK, gin.H{
+			"success": true,
+		})
 	}
-	fmt.Println(urlLog)
 
-	res, err := urlsLogColl.UpdateOne(ctx, bson.D{{"_id", urlLog.Id}}, bson.M{"$set": bson.M{"click_count": urlLog.ClickCount + 1}})
-	common.IsErr(err, true)
-
-	fmt.Println(res)
 }
 
 func GetAllUrls() gin.HandlerFunc {
