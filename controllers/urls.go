@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/MrMohebi/golang-gin-boilerplate.git/common"
+	"github.com/MrMohebi/golang-gin-boilerplate.git/constant"
 	"github.com/MrMohebi/golang-gin-boilerplate.git/models"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -23,34 +24,42 @@ func CreateUrl() gin.HandlerFunc {
 
 		var reqBody models.Url
 
-		err := c.BindJSON(&reqBody)
-		common.IsErr(err, true)
+		isValid := common.ValidRawJson(c, &reqBody)
+		if isValid {
+			shortUrl := common.RandStr(5)
 
-		shortUrl := common.RandStr(5)
+			url := models.Url{
+				Id:          primitive.NewObjectID(),
+				Title:       reqBody.Title,
+				ShortLink:   shortUrl,
+				OriginalUrl: reqBody.OriginalUrl,
+				CreatedAt:   now.Format(time.DateTime),
+				UpdatedAt:   now.Format(time.DateTime),
+				Status:      constant.StatusActive,
+			}
+			_, err := urlsColl.InsertOne(ctx, url)
+			if err != nil {
+				common.IsErr(err, false)
+				return
+			}
 
-		url := models.Url{
-			Id:          primitive.NewObjectID(),
-			Title:       reqBody.Title,
-			ShortLink:   shortUrl,
-			OriginalUrl: reqBody.OriginalUrl,
-			CreatedAt:   now.Format(time.DateTime),
-			UpdatedAt:   now.Format(time.DateTime),
+			urlLog := models.UrlLog{
+				Id:         primitive.NewObjectID(),
+				UrlId:      url.Id,
+				ClickCount: 0,
+			}
+			_, err = urlsLogColl.InsertOne(ctx, urlLog)
+			if err != nil {
+				common.IsErr(err, false)
+				return
+			}
+
+			if err == nil {
+				c.JSON(http.StatusOK, url)
+			}
 		}
-
-		urlLog := models.UrlLog{
-			Id:         primitive.NewObjectID(),
-			UrlId:      url.Id,
-			ClickCount: 0,
-		}
-
-		_, err = urlsColl.InsertOne(ctx, url)
-		common.IsErr(err, true)
-
-		_, err = urlsLogColl.InsertOne(ctx, urlLog)
-		common.IsErr(err, true)
-
-		c.JSON(http.StatusOK, url)
 	}
+
 }
 
 func RedirectUrl() gin.HandlerFunc {
@@ -85,7 +94,6 @@ func UpdateLogs(urlId primitive.ObjectID, c *gin.Context) {
 			"success": true,
 		})
 	}
-
 }
 
 func GetAllUrls() gin.HandlerFunc {
@@ -106,8 +114,6 @@ func GetAllUrls() gin.HandlerFunc {
 				"count": count,
 				"date":  urls,
 			})
-			//c.JSON(http.StatusOK, urls)
 		}
-
 	}
 }

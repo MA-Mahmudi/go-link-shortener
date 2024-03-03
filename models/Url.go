@@ -10,7 +10,7 @@ type Url struct {
 	Id          primitive.ObjectID `json:"id" bson:"_id"`
 	Title       string             `json:"title" bson:"title"`
 	ShortLink   string             `json:"short_link" bson:"short_link"`
-	OriginalUrl string             `json:"original_url" bson:"original_url"`
+	OriginalUrl string             `json:"original_url" bson:"original_url" validate:"required"`
 	CreatedAt   string             `json:"created_at" bson:"created_at"`
 	UpdatedAt   string             `json:"updated_at" bson:"updated_at"`
 	DeletedAt   string             `json:"deleted_at" bson:"deleted_at"`
