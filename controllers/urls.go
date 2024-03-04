@@ -19,11 +19,17 @@ func CreateUrl() gin.HandlerFunc {
 		defer cancel()
 		now := time.Now()
 
-		var reqBody models.Url
+		var reqBody models.CreateUrlStruct
 
 		isValid := common.ValidRawJson(c, &reqBody)
 		if isValid {
-			shortUrl := common.RandStr(5)
+			customUrl := reqBody.CustomUrl
+			shortUrl := ""
+			if len(customUrl) == 0 {
+				shortUrl = common.RandStr(5)
+			} else {
+				shortUrl = customUrl
+			}
 
 			url := models.Url{
 				Id:          primitive.NewObjectID(),
@@ -45,6 +51,8 @@ func CreateUrl() gin.HandlerFunc {
 				UrlId:      url.Id,
 				ClickCount: 0,
 				Timestamp:  now.Unix(),
+				IpAddress:  "host",
+				IsBot:      0,
 			}
 			_, err = models.UrlsLogsCollection.InsertOne(ctx, urlLog)
 			if err != nil {
