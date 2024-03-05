@@ -65,7 +65,12 @@ func IsUrlActive(c *gin.Context, id primitive.ObjectID) bool {
 		expireDate, _ := time.ParseInLocation(time.DateTime, urlToCheck.ExpireDate, time.Local)
 
 		if now.After(expireDate) {
-			_, err := models.UrlsCollection.UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": bson.M{"status": constant.StatusExpired}})
+			_, err := models.UrlsCollection.UpdateOne(ctx, bson.M{"_id": id}, bson.M{
+				"$set": bson.M{
+					"status":     constant.StatusExpired,
+					"updated_at": now.Format(time.DateTime),
+				},
+			})
 			if err != nil {
 				common.IsErr(err, false)
 				c.JSON(http.StatusInternalServerError, err)
