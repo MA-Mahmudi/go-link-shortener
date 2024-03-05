@@ -25,8 +25,12 @@ func RedirectUrl() gin.HandlerFunc {
 			c.JSON(http.StatusNotFound, gin.H{"message": "Invalid link"})
 		}
 
-		InsertLog(c, url.Id)
-		c.Redirect(http.StatusFound, url.OriginalUrl)
+		isActive := IsUrlActive(c, url.Id)
+
+		if isActive == true {
+			InsertLog(c, url.Id)
+			c.Redirect(http.StatusFound, url.OriginalUrl)
+		}
 	}
 }
 
