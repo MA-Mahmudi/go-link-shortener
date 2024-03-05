@@ -12,38 +12,39 @@ import (
 	"time"
 )
 
-//func UpdateStatus() *gin.HandlerFunc {
-//	return func(c *gin.Context) {
-//		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-//		defer cancel()
-//
-//	}
-//}
+type deleteReqBody struct {
+	Id primitive.ObjectID `json:"id" validate:"required"`
+}
 
-func DeleteUrl(c *gin.Context, id primitive.ObjectID) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	now := time.Now()
+func DeleteUrl() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		now := time.Now()
 
-	res, err := models.UrlsCollection.UpdateOne(ctx, bson.M{"_id": id}, bson.M{
-		"$set": bson.M{
-			"status":     constant.StatusDeleted,
-			"updated_at": now.Format(time.DateTime),
-			"deleted_at": now.Format(time.DateTime),
-		},
-	})
-	if err != nil {
-		common.IsErr(err, false)
-		c.JSON(http.StatusNotFound, gin.H{
-			"message": "Url not found",
-		})
-		return
-	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"success": "ok",
-			"message": "Status has been updated.",
-			"data":    res,
-		})
+		var reqBody deleteReqBody
+
+		if isValid := common.ValidRawJson(c, &reqBody); isValid {
+			_, err := models.UrlsCollection.UpdateOne(ctx, bson.M{"_id": reqBody.Id}, bson.M{
+				"$set": bson.M{
+					"status":     constant.StatusDeleted,
+					"updated_at": now.Format(time.DateTime),
+					"deleted_at": now.Format(time.DateTime),
+				},
+			})
+			if err != nil {
+				common.IsErr(err, false)
+				c.JSON(http.StatusNotFound, gin.H{
+					"message": "Url not found.",
+				})
+				return
+			} else {
+				c.JSON(http.StatusOK, gin.H{
+					"success": "ok",
+					"message": "Url has been deleted.",
+				})
+			}
+		}
 	}
 }
 
@@ -57,7 +58,7 @@ func IsUrlActive(c *gin.Context, id primitive.ObjectID) bool {
 	err := models.UrlsCollection.FindOne(ctx, bson.M{"_id": id}).Decode(&urlToCheck)
 	if err != nil {
 		common.IsErr(err, false)
-		c.JSON(http.StatusNotFound, gin.H{"message": "Url not found"})
+		c.JSON(http.StatusNotFound, gin.H{"message": "Url not found."})
 		return false
 	}
 	if len(urlToCheck.ExpireDate) > 0 && urlToCheck.Status == constant.StatusActive {

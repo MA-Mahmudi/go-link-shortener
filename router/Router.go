@@ -14,4 +14,5 @@ func Routs(r *gin.Engine) {
 	r.POST("/url/create", controllers.CreateUrl())
 	r.GET("/:short_url", controllers.RedirectUrl())
 	r.GET("/url/show_all", controllers.GetAllUrls())
+	r.POST("/url/delete", controllers.DeleteUrl())
 }
