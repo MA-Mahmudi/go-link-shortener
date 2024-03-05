@@ -13,20 +13,23 @@ import (
 	"time"
 )
 
-var urlsColl = models.UrlsCollection
-var urlsLogColl = models.UrlsLogsCollection
-var now = time.Now()
-
 func CreateUrl() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
+		now := time.Now()
 
-		var reqBody models.Url
+		var reqBody models.CreateUrlStruct
 
 		isValid := common.ValidRawJson(c, &reqBody)
 		if isValid {
-			shortUrl := common.RandStr(5)
+			customUrl := reqBody.CustomUrl
+			shortUrl := ""
+			if len(customUrl) == 0 {
+				shortUrl = common.RandStr(5)
+			} else {
+				shortUrl = customUrl
+			}
 
 			url := models.Url{
 				Id:          primitive.NewObjectID(),
@@ -36,8 +39,9 @@ func CreateUrl() gin.HandlerFunc {
 				CreatedAt:   now.Format(time.DateTime),
 				UpdatedAt:   now.Format(time.DateTime),
 				Status:      constant.StatusActive,
+				ExpireDate:  reqBody.ExpireDate,
 			}
-			_, err := urlsColl.InsertOne(ctx, url)
+			_, err := models.UrlsCollection.InsertOne(ctx, url)
 			if err != nil {
 				common.IsErr(err, false)
 				return
@@ -47,8 +51,11 @@ func CreateUrl() gin.HandlerFunc {
 				Id:         primitive.NewObjectID(),
 				UrlId:      url.Id,
 				ClickCount: 0,
+				Timestamp:  now.Unix(),
+				IpAddress:  "host",
+				IsBot:      0,
 			}
-			_, err = urlsLogColl.InsertOne(ctx, urlLog)
+			_, err = models.UrlsLogsCollection.InsertOne(ctx, urlLog)
 			if err != nil {
 				common.IsErr(err, false)
 				return
@@ -62,40 +69,6 @@ func CreateUrl() gin.HandlerFunc {
 
 }
 
-func RedirectUrl() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-
-		shortLink := c.Param("short_url")
-		var url models.Url
-		err := urlsColl.FindOne(ctx, bson.D{{"short_link", shortLink}}).Decode(&url)
-		common.IsErr(err, true)
-		UpdateLogs(url.Id, c)
-		c.Redirect(http.StatusFound, url.OriginalUrl)
-
-	}
-}
-
-func UpdateLogs(urlId primitive.ObjectID, c *gin.Context) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	var urlLog models.UrlLog
-
-	urlNotFind := urlsLogColl.FindOne(ctx, bson.M{"url_id": urlId}).Decode(&urlLog)
-	if urlNotFind != nil {
-		common.IsErr(urlNotFind, false)
-		c.JSON(http.StatusNotFound, gin.H{"message": "لینک مورد نظر یافت نشد."})
-	} else {
-		_, err := urlsLogColl.UpdateOne(ctx, bson.D{{"_id", urlLog.Id}}, bson.M{"$set": bson.M{"click_count": urlLog.ClickCount + 1}})
-		common.IsErr(err, true)
-		c.JSON(http.StatusOK, gin.H{
-			"success": true,
-		})
-	}
-}
-
 func GetAllUrls() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -103,8 +76,8 @@ func GetAllUrls() gin.HandlerFunc {
 
 		var urls []models.Url
 
-		count, _ := urlsColl.CountDocuments(ctx, bson.M{})
-		res, err := urlsColl.Find(ctx, bson.M{})
+		count, _ := models.UrlsCollection.CountDocuments(ctx, bson.M{})
+		res, err := models.UrlsCollection.Find(ctx, bson.M{})
 		if err != nil {
 			common.IsErr(err, false)
 			c.JSON(http.StatusInternalServerError, err)
