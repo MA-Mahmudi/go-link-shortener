@@ -39,6 +39,7 @@ func CreateUrl() gin.HandlerFunc {
 				CreatedAt:   now.Format(time.DateTime),
 				UpdatedAt:   now.Format(time.DateTime),
 				Status:      constant.StatusActive,
+				ExpireDate:  reqBody.ExpireDate,
 			}
 			_, err := models.UrlsCollection.InsertOne(ctx, url)
 			if err != nil {

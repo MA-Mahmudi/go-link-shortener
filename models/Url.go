@@ -22,6 +22,7 @@ type CreateUrlStruct struct {
 	Title       string `json:"title" bson:"title"`
 	OriginalUrl string `json:"original_url" bson:"original_url" validate:"required"`
 	CustomUrl   string `json:"custom_url" bson:"custom_url"`
+	ExpireDate  string `json:"expire_date" bson:"expire_date"`
 }
 
 var UrlsCollection *mongo.Collection = configs.GetCollection(configs.GetDBClint(), "urls")
