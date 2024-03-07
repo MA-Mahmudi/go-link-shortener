@@ -25,3 +25,7 @@ func EnvMongoURI() string {
 func EvnMongoDB() string {
 	return os.Getenv("MONGO_DB")
 }
+
+func EnvServeHost() string {
+	return os.Getenv("SERV_HOST") + ":" + os.Getenv("SERV_PORT")
+}
