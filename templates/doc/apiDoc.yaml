@@ -3,44 +3,79 @@ info:
   title: go api boilerplate
   description: go api boilerplate.
   version: 1.0.0
-host: m3m.dev
-basePath: /api
+host: localhost:8005
+#basePath: /api
 schemes:
   - https
 
 paths:
-  /login.php:
+  /url/create:
     post:
-      summary: login or create new user
+      summary: Create a short url.
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
-                username:
+                original_url:
                   type: string
-                password:
+                custom_url:
+                  type: string
+                title:
+                  type: string
+                expire_date:
                   type: string
               example:
-                id: mrm
-                name: pass
+                original_url: https://zoodex.ir/
+                title: Zoodex home page
+                expire_date: 2024-03-05 12:34:16
       responses:
-        '200':
-          description: token and hasAccess.
+        "200":
+          description: Short url has been created.
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  token:
+                  id:
+                    type: number
+                  title:
+                    type: ?string
+                  original_url:
                     type: string
-                  hasAccess:
-                    type: boolean
-                example:
-                  token: a5c65213e46dd08bfaba2c75ff4eabaf
-                  hasAccess: true
-        '400':
-          description: wrong input.
-        '401':
-          description: wrong password.
+                  short_link:
+                    type: string
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
+                  deleted_at:
+                    type: ?string
+                  expire_date:
+                    type: ?string
+                  status:
+                    type: number
+
+        "422":
+          description: Wrong input.
+
+#      responses:
+#        '200':
+#          description: token and hasAccess.
+#          content:
+#            application/json:
+#              schema:
+#                type: object
+#                properties:
+#                  token:
+#                    type: string
+#                  hasAccess:
+#                    type: boolean
+#                example:
+#                  token: a5c65213e46dd08bfaba2c75ff4eabaf
+#                  hasAccess: true
+#        '400':
+#          description: wrong input.
+#        '401':
+#          description: wrong password.
