@@ -56,26 +56,63 @@ paths:
                     type: ?string
                   status:
                     type: number
+                example:
+                  id: "65ebe86993c37cf386c9804b"
+                  title: "test"
+                  short_link: "kGrAS"
+                  original_url: "https://admin.zoodex.ir"
+                  created_at: "2024-03-09 08:11:13"
+                  updated_at: "2024-03-09 08:11:13"
+                  deleted_at: ""
+                  expire_date: "2024-03-10 14:48:09"
+                  status: 1
 
         "422":
           description: Wrong input.
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Wrong input."
 
-#      responses:
-#        '200':
-#          description: token and hasAccess.
-#          content:
-#            application/json:
-#              schema:
-#                type: object
-#                properties:
-#                  token:
-#                    type: string
-#                  hasAccess:
-#                    type: boolean
-#                example:
-#                  token: a5c65213e46dd08bfaba2c75ff4eabaf
-#                  hasAccess: true
-#        '400':
-#          description: wrong input.
-#        '401':
-#          description: wrong password.
+
+  /url/delete:
+    post:
+      summary: Delete a url (Diactivate)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+              example:
+                id: "65ebe86993c37cf386c9804b"
+      responses:
+        "200":
+          description: Url has been deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: "ok"
+                  message: "Url has been deleted."
+        "404":
+          description: Url not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Url not found."
+        "422":
+          description: Wrong input.
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Invalid input."
