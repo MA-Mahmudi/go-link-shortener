@@ -1,12 +1,11 @@
-swagger: "2.0"
+openapi: 3.1.0
 info:
-  title: go api boilerplate
-  description: go api boilerplate.
+  title: Link shortener docs
+  description: Documents for golang link shortener.
   version: 1.0.0
-host: localhost:8005
-#basePath: /api
-schemes:
-  - https
+servers:
+  - url: http://localhost:8005
+  - url: http://localhost:8005
 
 paths:
   /url/create:
@@ -79,7 +78,7 @@ paths:
 
   /url/delete:
     post:
-      summary: Delete a url (Diactivate)
+      summary: Delete a url (Deactivate)
       requestBody:
         content:
           application/json:
